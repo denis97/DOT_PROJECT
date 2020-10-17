@@ -27,8 +27,8 @@ RP= (V*3/4)**(1/3) #cm perturbation radius
 
 
 rs=[0,0,0]
-rd= [0,0,2]
-rp=[0, 0 ,3]
+rd= [0,0,0]
+rp=[0, 0 ,2]
 
 r= np.linalg.norm(rd)
 Phi0= (c/(4*np.pi*c*D*t)**(3/2))*np.exp(-(r**2/(4*D*c*t))-c*mua*t)
@@ -38,6 +38,7 @@ def perturbation(rs,rd,rp):
     r= np.linalg.norm(rd)
     xs,ys,zs= rs
     xd,yd,zd= rd
+    xp,yp,zp = rp
     
     X,Y,Z= np.mgrid[-6:6:dim*1j,-6:6:dim*1j,-6:6:dim*1j]
     
@@ -72,7 +73,7 @@ def perturbation(rs,rd,rp):
            return [(h**3)*np.sum(dmua*(1/rho12 + 1/rho23) * np.exp(- (rho12 +rho23)**2 /(4*c*D*t))) 
                    for t in tt]
     
-    delPhi0= -(c**2/(4*np.pi*c*D)**(5/2))*(t**2/3)*np.exp(-(r**2/(4*D*c*t))-c*mua*t) * sumInt(t)
+    delPhi0= -(c**2/(4*np.pi*c*D)**(5/2))*(t**-3/2)*np.exp(-c*mua*t) * sumInt(t)
     return delPhi0
 
 delPhi0= perturbation(rs,rd,rp)   
@@ -84,7 +85,7 @@ ax=[]
 
 ax.append(fig2.add_subplot(311))
 ax[0].plot(t,Phi0)
-ax[0].set(ylabel="$ \Phi_0 $")
+ax[0].set(ylabel="$ \Phi_0 $", yscale="log")
 
 
 ax.append(fig2.add_subplot(312))
@@ -93,7 +94,8 @@ ax[1].set(ylabel="$ \delta \Phi_0 $")
 
 ax.append(fig2.add_subplot(313))
 ax[2].plot(t,Contrast)
-ax[2].set(ylabel="$ Contrast$")
+ax[2].set(ylabel="$ Contrast$" )
+ax[2].autoscale()
 
 
 fig2.show()
