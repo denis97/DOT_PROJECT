@@ -21,14 +21,22 @@ D=1/(3*mus) #cm
 
 t=np.linspace(0,3,1000)[1:] # ns
 
-V=1 #cm^3 perturbation dimension
+mus= 10 *cm**-1
+mua=0.1  *cm**-1
+Dmua=0.1 *cm**-1
+D=1/(3*mus)
+ns=1e-9
+
+t=np.linspace(0,3,10000)[1:] * ns
+
+V=1 *cm**3 #perturbation dimension
 
 RP= (V*3/4)**(1/3) #cm perturbation radius
 
 
-rs=[0,0,0]
-rd= [0,0,0]
-rp=[0, 0 ,2]
+rs=np.array([0,0,0]) *cm
+rd= np.array([0,0,0])*cm
+rp=np.array([0, 0 ,2])* cm
 
 r= np.linalg.norm(rd)
 Phi0= (c*((4*np.pi*c*D*t)**(-3/2)))*np.exp(-c*mua*t)
