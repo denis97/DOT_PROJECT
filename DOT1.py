@@ -14,12 +14,12 @@ dim=21
 ## Problem data
 n=1 #refraction index
 c= 30/n # cm/ns
-mus= 1 #cm^-1
+mus= 10 #cm^-1
 mua=0.1 # cm^-1
 Dmua=0.1 #cm^-1
 D=1/(3*mus) #cm
 
-t=np.linspace(0,3,10000)[1:] # ns
+t=np.linspace(0,3,1000)[1:] # ns
 
 V=1 #cm^3 perturbation dimension
 
@@ -31,7 +31,7 @@ rd= [0,0,0]
 rp=[0, 0 ,2]
 
 r= np.linalg.norm(rd)
-Phi0= (c/(4*np.pi*c*D*t)**(3/2))*np.exp(-(r**2/(4*D*c*t))-c*mua*t)
+Phi0= (c*((4*np.pi*c*D*t)**(-3/2)))*np.exp(-c*mua*t)
 
 def perturbation(rs,rd,rp):
     
@@ -85,7 +85,7 @@ ax=[]
 
 ax.append(fig2.add_subplot(311))
 ax[0].plot(t,Phi0)
-ax[0].set(ylabel="$ \Phi_0 $", yscale="log")
+ax[0].set(ylabel="$ \Phi_0 $", yscale="linear")
 
 
 ax.append(fig2.add_subplot(312))
