@@ -21,7 +21,7 @@
 # $$\delta \phi_0(\mu_a,\mu_s',t, \delta \mu_a,V,\vec{r}) = -\frac{c^2}{(4\pi D c)^{5/2} t^{3/2}} \cdot exp(-\mu_a c t) \int_{V_i} \delta \mu_a (\vec {r_p}) \left(\frac{1}{\rho_{12}} + \frac{1}{\rho_{23}}\right) exp\left\{-\frac{\left(\rho_{12} +\rho_{23}\right)^2}{4cDt}\right\} d^3 \vec{r_p}$$
 # 
 # 
-# 3. write $C(t) \equiv  \delta \phi_0\big/ \phi_0 $ : $$ C(t) = - \frac{1}{4 \pi D} \cdot \delta \mu_a V \left(\frac{1}{\rho_{12}} + \frac{1}{\rho_{23}}\right) \cdot exp\left\{-\frac{\left(\rho_{12} +\rho_{23}\right)^2}{4cDt}\right\} $$
+# 3. write $C(t) \equiv  \delta \phi_0\big/ \phi_0$ : $$C(t) = - \frac{1}{4 \pi D} \cdot \delta \mu_a V \left(\frac{1}{\rho_{12}} + \frac{1}{\rho_{23}}\right) \cdot exp\left\{-\frac{\left(\rho_{12} +\rho_{23}\right)^2}{4cDt}\right\}$$
 # 
 # 
 # ### Plots
@@ -67,74 +67,25 @@ rp=np.array([0, 0 ,2])
 r= np.linalg.norm(rd)
 Phi0= 1e13*(c*((4*np.pi*c*D*t)**(-3/2)))*np.exp(-c*mua*t)
 
-def perturbation(t,rs,rd,rp, perturbation="point-like",spacedomain=False,contrast=False):
+def perturbation(t,rs,rd,rp,contrast=True):
     
     r= np.linalg.norm(rd)
     xs,ys,zs= rs
     xd,yd,zd= rd
     xp,yp,zp = rp
-    
-    
-    
 
-    
-    
-    
-    # fig = plt.figure()
-    # ax = fig.gca(projection='3d')
-    # ax.voxels(X, Y, Z, mask,edgecolor='k')
-    
-    # plt.show()
-    
-    
-    if perturbation== "normal":
-        
-        X,Y,Z= np.mgrid[-6:6:dim*1j,-6:6:dim*1j,-6:6:dim*1j]
-        h=X[1,0,0]-X[0,0,0]
-        
-#         ax = fig.gca(projection='3d')
-#         ax.voxels(X, Y, Z, dmua,edgecolor='k')
 
-#         plt.show()
-        
-        
-        def midpoints(x):
-            sl = ()
-            for i in range(x.ndim):
-                x = (x[sl + np.index_exp[:-1]] + x[sl + np.index_exp[1:]]) / 2.0
-                sl += np.index_exp[:]
-            return x
-
-        xm,ym,zm= midpoints(X), midpoints(Y),midpoints(Z)
-
-        mask = (xm-xp)**2+(ym-yp)**2+(zm-zp)**2 <RP**2
-        dmua=np.zeros(mask.shape)
-        dmua[mask]=Dmua #cm^-1
-        
-        
-        def sumInt(tt):
-            rho12= np.sqrt((xm-xs)**2+(ym-ys)**2+(zm-zs)**2)
-            rho23= np.sqrt((xm-xd)**2+(ym-yd)**2+(zm-zd)**2)
-            return [(h**3)*np.sum(dmua*(1/rho12 + 1/rho23) * np.exp(-(rho12 +rho23)**2 /(4*c*D*t))) for t in tt]
-        
-        delPhi0= -1e13*(c**2/(4*np.pi*c*D)**(5/2))*(t**-3/2)*np.exp(-c*mua*t) * sumInt(t)
-        return delPhi0 , dmua
-        
-    if perturbation == "point-like":
-
-        def sumInt(tt):
-            rho12 = np.linalg.norm(rp-rs)
-            rho23 = np.linalg.norm(rp-rd)
-            if spacedomain:
-                return (V)*Dmua*(1/rho12 + 1/rho23)* np.exp(- (rho12 +rho23)**2 /(4*c*D*t))
-            else:
-                return [(V)*Dmua*(1/rho12 + 1/rho23)* np.exp(- (rho12 +rho23)**2 /(4*c*D*t)) for t in tt]
-        if contrast:
-            contrast= -1/(4*np.pi*D) * np.array(sumInt(t))
-            return contrast
-        else:    
-            delPhi0= -1e13*(c**2/(4*np.pi*c*D)**(5/2))*(t**-3/2)*np.exp(-c*mua*t) * np.array(sumInt(t))
-            return delPhi0
+    def sumInt(tt):
+        rho12 = np.linalg.norm(rp-rs)
+        rho23 = np.linalg.norm(rp-rd)
+        return (V)*Dmua*(1/rho12 + 1/rho23)* np.exp(- (rho12 +rho23)**2 /(4*c*D*t))
+    
+    if contrast:
+        contrast= -1/(4*np.pi*D) * np.array(sumInt(t))
+        return contrast
+    else:    
+        delPhi0= -1e13*(c**2/(4*np.pi*c*D)**(5/2))*(t**-3/2)*np.exp(-c*mua*t) * np.array(sumInt(t))
+        return delPhi0
 
 
 
@@ -165,7 +116,7 @@ for iteration,mua in enumerate(muas):
     axs[0].plot(t,Phi0,color=colors(iteration),label=format(mua, '.2f'))
     axs[0].set_title("Homogeneous $\Phi_0$ with varying $\mu_a$",fontweight="bold")
     axs[0].set_ylabel("$\Phi_0$",fontsize=15, labelpad=5,loc="center")
-    axs[0].set_xlabel("$t\ [ns] $",fontsize=15, labelpad=10,loc="right")
+    axs[0].set_xlabel("$time\ [ns] $",fontsize=15, labelpad=10,loc="right")
     axs[0].legend()
 
 
@@ -181,11 +132,16 @@ for iteration,mus in enumerate(muss):
     axs[1].plot(t,Phi0,color=colors(iteration),label=format(mus, '.2f'))
     axs[1].set_title("Homogeneous $\Phi_0$ with varying $\mu_s$",fontweight="bold")
     axs[1].set_ylabel("$\Phi_0$",fontsize=15, labelpad=5,verticalalignment="center")
-    axs[1].set_xlabel("$t\ [ns] $",fontsize=15, labelpad=10,loc="right")
+    axs[1].set_xlabel("$time\ [ns] $",fontsize=15, labelpad=10,loc="right")
     axs[1].yaxis.set_tick_params(which='both', labelbottom=True)
 
     axs[1].legend()
 
+
+# 1) Fluence time response with varying absorption coefficient $\mu_a$ 
+# 
+# 2) Fluence time response with varying diffusion coefficient $\mu_s$
+# 
 
 # In[4]:
 
@@ -199,8 +155,7 @@ for iteration,zp in enumerate(zp):
     rd= np.array([0,0,0])
     rp=np.array([0, 0 ,zp])
     
-    Contrast= perturbation(t,rs,rd,rp,contrast=True,spacedomain=True)   
-    ##Contrast= delPhi0/Phi0
+    Contrast= perturbation(t,rs,rd,rp)   
     plt.plot(t,Contrast,label="zp= "+format(zp, '.2f')+" cm")
     plt.title("Contrast vs depth of perturbation",fontsize=15, fontweight="bold")
     plt.ylabel("Contrast", fontsize=15)
@@ -211,11 +166,13 @@ for iteration,zp in enumerate(zp):
 #fig2.show()
 
 
+# Contrast time repsonse at several perturbation depth $z_p$, with $\mu_s= 10 \ cm^{-1}$, $\mu_a= 0.1 \ cm^{-1}$ and $\delta \mu_a = 0.1 \  cm^{-1}$
+
 # In[5]:
 
 
-tt=np.linspace(0,10,100)
-xp= np.linspace(-6,6,100)
+tt=np.linspace(0,10,50)
+xp= np.linspace(-6,6,1000)
 fig2= plt.figure()
 normalize = mcolors.Normalize(vmin=tt.min(), vmax=tt.max())
 
@@ -231,7 +188,7 @@ for iteration,t in enumerate(tt[1:]):
         rd= np.array([0,0,0])
         rp=np.array([x, 0 ,2])
 
-        cc= perturbation(t,rs,rd,rp,spacedomain=True,contrast=True)   
+        cc= perturbation(t,rs,rd,rp)   
         Contrast.append(cc)
     plt.plot(xp,Contrast,color=colormap(normalize(t)))
     plt.title("Contrast vs x position of pert.",fontsize=15, fontweight="bold")
@@ -248,8 +205,4 @@ cb.update_ticks()
     
 
 
-# In[ ]:
-
-
-
-
+# Contrast time evolution as a function of perturbation off-axis position $x_p$ , with perturbation depth $z_p = 2 \ cm$, $\mu_s= 10 \ cm^{-1}$, $\mu_a= 0.1 \ cm^{-1}$ and $\delta \mu_a = 0.1 \  cm^{-1}$
