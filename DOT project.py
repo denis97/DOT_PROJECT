@@ -11,17 +11,18 @@
 #  
 # ### Formula on Contrast :
 # 
-# 1. write fluence  $\phi_0(\mu_a,\mu_s',t)$ for an homogeneous medium:
+# 1. write fluence  $\phi_0(\mu_a,\mu_s',t)$ for an homogeneous medium with $ \vec{r}=0 $ (source coincident with detector) :
 # 
 # $$ \phi_0(\mu_a,\mu_s',t)= \frac{c}{(4\pi cD t)^{3/2}}\cdot exp(-c\mu_a t)$$
 # 
 # 
-# 2. write fluence perturbation $\delta \phi_0(\mu_a,\mu_s',t, \delta \mu_a,V,\vec{r})$ :
+# 2. write fluence perturbation $\delta \phi_0(\mu_a,\mu_s',t, \delta \mu_a,V,\vec{r_p})$ :
 # 
-# $$\delta \phi_0(\mu_a,\mu_s',t, \delta \mu_a,V,\vec{r}) = -\frac{c^2}{(4\pi D c)^{5/2} t^{3/2}} \cdot exp(-\mu_a c t) \int_{V_i} \delta \mu_a (\vec {r_p}) \left(\frac{1}{\rho_{12}} + \frac{1}{\rho_{23}}\right) exp\left\{-\frac{\left(\rho_{12} +\rho_{23}\right)^2}{4cDt}\right\} d^3 \vec{r_p}$$
+# $$\delta \phi_0(\mu_a,\mu_s',t, \delta \mu_a,V,\vec{r_p}) = -\frac{c^2}{(4\pi D c)^{5/2} t^{3/2}} \cdot exp(-\mu_a c t) \int_{V_i} \delta \mu_a (\vec {r_p}) \left(\frac{1}{\rho_{12}} + \frac{1}{\rho_{23}}\right) exp\left\{-\frac{\left(\rho_{12} +\rho_{23}\right)^2}{4cDt}\right\} d^3 \vec{r_p}$$
+# Approximating perturbation as a point-like one:
+# $$\delta \phi_0(\mu_a,\mu_s',t, \delta \mu_a,V,\vec{r_p}) = -\frac{c^2}{(4\pi D c)^{5/2} t^{3/2}} \cdot exp(-\mu_a c t) \cdot \delta \mu_a (\vec {r_p}) \left(\frac{1}{\rho_{12}} + \frac{1}{\rho_{23}}\right) exp\left\{-\frac{\left(\rho_{12} +\rho_{23}\right)^2}{4cDt}\right\} V $$
 # 
-# 
-# 3. write $C(t) \equiv  \delta \phi_0\big/ \phi_0$ : $$C(t) = - \frac{1}{4 \pi D} \cdot \delta \mu_a V \left(\frac{1}{\rho_{12}} + \frac{1}{\rho_{23}}\right) \cdot exp\left\{-\frac{\left(\rho_{12} +\rho_{23}\right)^2}{4cDt}\right\}$$
+# 3. write $C(t) \equiv  \delta \phi_0\big/ \phi_0$ : $$C(t) = - \frac{1}{4 \pi D} \cdot \delta \mu_a V \left(\frac{2}{|\vec{r_p}|}\right) \cdot exp\left\{-\frac{|\vec{r_p}|^2}{cDt}\right\}$$
 # 
 # 
 # ### Plots
