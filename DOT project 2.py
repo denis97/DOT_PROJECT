@@ -16,7 +16,7 @@ import time
 import plotly.graph_objects as go
 
 
-# In[55]:
+# In[26]:
 
 
 
@@ -37,29 +37,31 @@ V=1 #cm^3 perturbation dimension
 
 RP= (V*3/(4*np.pi))**(1/3) #cm perturbation radius
 
-step=2.5
+step=5
 
 x=y=z= np.arange(0,64.1,step) * mm
 
 xs=ys=np.arange(4,60.1,step) * mm
 
-Xs, Ysd = np.meshgrid(xs,ys,xs,ys) #source-detector grid
+Xs, Ys,Xd,Yd = np.meshgrid(xs,ys,xs,ys) #source-detector grid
 
-Xsf=Xsd.flatten()
-Ysf= Ysd.flatten()
+Xsf=Xs.flatten()
+Ysf=Ys.flatten()
+Xdf=Xd.flatten()
+Ydf=Yd.flatten()
 
 X,Y,Z= np.meshgrid(x,y,z)  #space voxels
 
 Xf,Yf,Zf=X.flatten(), Y.flatten(), Z.flatten()
 
-xp,yp,zp = [1.5, 2.5 ,3]
+xp,yp,zp = [1.5, 2.5 ,1]
 
 
 # ### Absorption perturbation vector $\vec A$
 # 
 # Calculate A
 
-# In[56]:
+# In[27]:
 
 
 mask =(X-xp)**2+(Y-yp)**2+(Z-zp)**2 <RP**2
@@ -69,7 +71,7 @@ maskf =mask.flatten()
 A= maskf*Dmua
 
 
-# In[57]:
+# In[28]:
 
 
 print("n° elements of A:",A.size)
@@ -78,7 +80,7 @@ print("dimension of A reshaped:",A3D.shape)
 print("Unit of measurment of A is cm^-1")
 
 
-# In[58]:
+# In[123]:
 
 
 plt.rcParams['figure.dpi'] = 200
@@ -97,7 +99,7 @@ plt.colorbar(p)
 plt.show()
 
 
-# In[82]:
+# In[30]:
 
 
 graph= 1 # 1 o 2
@@ -118,30 +120,26 @@ if graph ==2:
     plt.show()
 
 
-# In[ ]:
-
-
-
-
-
 # ### Sensitivity Matrix $W$
 
-# In[60]:
+# In[47]:
 
 
 start = time.time()
-i, m = np.ogrid[:Xsf.size,:Xf.size]
+i,m= np.ogrid[:Xsf.size,:Xf.size]
 start = time.time()
-rho= np.sqrt((Xsf[i]-Xf[m])**2 + (Ysf[i]-Yf[m])**2 +(Zf[m])**2)
 
+rho12= np.sqrt((Xsf[i]-Xf[m])**2 + (Ysf[i]-Yf[m])**2 +(Zf[m])**2) # distance source-pert
+rho23= np.sqrt((Xdf[i]-Xf[m])**2 + (Ydf[i]-Yf[m])**2 +(Zf[m])**2) # distance detector-pert
+r=np.sqrt((Xsf[i]-Xdf[i])**2 + (Ysf[i]-Ydf[i])**2)
 
 
 W=0
 tt=(t[1:] + t[:-1]) / 2
 np.seterr(divide='ignore')
-Sp=-1/(4*np.pi*D)*dt*((step*0.1)**3)*(np.divide(2,rho))
+Sp=-1/(4*np.pi*D)*dt*((step*0.1)**3)*(1/rho12 + 1/rho23)
 
-W= list(map(lambda t: Sp*np.exp(-(2*rho)**2 /(4*c*D*t)),tt))
+W= list(map(lambda t: Sp*np.exp((-(rho12+rho23)**2 +r**2) /(4*c*D*t)),tt))
 W=np.sum(W,axis=0)/t[-1]
 
 W[np.isinf(W)]=0
@@ -150,7 +148,7 @@ end = time.time()
 print(end - start)
 
 
-# In[61]:
+# In[48]:
 
 
 print("n° elements of W:",W.size)
@@ -158,7 +156,7 @@ print("dimension of W:",W.shape)
 print("Unit of measurment of A is cm^-1")
 
 
-# In[62]:
+# In[49]:
 
 
 plt.figure()
@@ -173,7 +171,7 @@ plt.show()
 
 
 
-# In[63]:
+# In[50]:
 
 
 V_vox=np.sum(maskf)*(step*0.1)**3
@@ -182,36 +180,49 @@ print(V_vox)
 
 # ### Measurments vector M
 
-# In[64]:
+# In[51]:
 
 
 Mf=np.inner(W,A)
 
 
-# In[65]:
+# In[52]:
 
 
-M=Mf.reshape((xsp.size,ysp.size))
+M=Mf.reshape((xs.size,ys.size,xs.size,ys.size))
 
 
-# In[66]:
+# In[125]:
 
 
+Msum=np.sum(M,(2,3))
+
+
+# In[126]:
+
+
+plt.close()
 plt.figure()
-plt.imshow(M,cmap='jet',aspect='equal',extent=[4,60,60,4])
+plt.imshow(Msum,cmap='jet',aspect='equal',extent=[4,60,60,4])
 plt.colorbar()
 plt.show()
 
 
+# In[56]:
+
+
+M[np.where(M==M.min())]
+
+
 # ### Singular values & vectors
 
-# In[76]:
+# In[58]:
 
 
 [U,s,Vh]=np.linalg.svd(W)
 
 
-# In[ ]:
+# In[59]:
 
 
 plt.figure()
@@ -242,7 +253,7 @@ plt.show()
 
 # ### Inverse problem
 
-# In[ ]:
+# In[60]:
 
 
 S=np.diag(s)
@@ -250,18 +261,34 @@ S.shape
 Sinv= np.zeros(W.shape).transpose()
 
 
-# In[ ]:
+# In[61]:
 
 
 i=range(s.size)
 Sinv[i,i]=1/s[i]
 
 
-# In[ ]:
+# In[62]:
 
 
 Winv= np.linalg.multi_dot([Vh.transpose(),Sinv,U.transpose()])
 Ap= Winv.dot(Mf)
+
+
+# In[63]:
+
+
+fffig = go.Figure(data=go.Volume(x=Xf, y=Yf, z=Zf,value=Ap,
+        opacity=0.1,# needs to be small to see through all surfaces
+        surface_count=50 #needs to be a large number for good volume rendering
+        ))
+fffig.show()
+
+
+# In[65]:
+
+
+Ap.max()
 
 
 # In[ ]:
@@ -273,24 +300,20 @@ App=np.linalg.pinv(W).dot(Mf)
 # In[ ]:
 
 
-fffig = go.Figure(data=go.Volume(x=Xf, y=Yf, z=Zf,value=Ap,
-        opacity=0.1,# needs to be small to see through all surfaces
-        surface_count=50 #needs to be a large number for good volume rendering
-        ))
-fffig.show()
-
-
-# In[69]:
-
-
 plt.figure()
 plt.imshow(rho,cmap='jet',aspect='equal')
 plt.colorbar()
 plt.show()
 
 
-# In[75]:
+# In[ ]:
 
 
 np.linalg.cond(W)
+
+
+# In[109]:
+
+
+plt.close()
 
